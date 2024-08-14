@@ -1,20 +1,19 @@
 // src/services/addressverification/address.js
-const db = require('../../db');
+const { queryDatabase } = require('../../db');
 
-function checkAddressValid(address, callback) {
-    const query = 'SELECT * FROM wm_address WHERE address = ?';
-
-    db.query(query, [address], (error, results) => {
-      if (error) {
-        return callback(error, null);
-      }
-
-      if (results.length > 0) {
-        return callback(null, true);
-      } else {
-        return callback(null, false);
-      }
-    });
+async function checkAddressValid(address) {
+  const query = 'SELECT * FROM wm_address WHERE address = ?';
+  
+  try {
+    const results = await queryDatabase(query, [address]);
+    if (results.length > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (error) {
+    throw new Error('Database query failed: ' + error.message);
+  }
 }
 
 module.exports = { checkAddressValid };
